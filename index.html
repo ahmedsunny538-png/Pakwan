@@ -15,7 +15,7 @@
 @media print{body{background:#fff!important}.no-print{display:none!important}.bill{display:block!important;box-shadow:none!important;margin:0 auto;padding:10px}.bill table{min-width:0}}
 </style></head>
 <body><div class="app" id="app">
-<header class="top"><div class="brand"><div class="logo">S</div><div><h1 id="brandTitle">AGHAI PAKWAN CENTER</h1><small>PAKWAN CENTER MANAGEMENT</small></div></div><div class="topright"><div class="langbar no-print"><button data-lang="en" class="active">EN</button><button data-lang="ur">اردو</button><button data-lang="ro">ROMAN</button></div><span class="pill" id="licenseBadge">20 DAY TRIAL</span><button class="gold" onclick="showPage('settings')">⚙</button></div></header>
+<header class="top"><div class="brand"><div class="logo">S</div><div><h1 id="brandTitle">AGHAI 21 PAKWAN CENTER</h1><small>PAKWAN CENTER MANAGEMENT</small></div></div><div class="topright"><div class="langbar no-print"><button data-lang="en" class="active">EN</button><button data-lang="ur">اردو</button><button data-lang="ro">ROMAN</button></div><span class="pill" id="licenseBadge">20 DAY TRIAL</span><button class="gold" onclick="showPage('settings')">⚙</button></div></header>
 <div class="layout"><aside class="no-print"><nav class="nav" id="nav"><button class="active" data-page="dashboard"><span class="navicon">▦</span>Dashboard</button><button data-page="counter"><span class="navicon">▣</span>Counter / POS</button><button data-page="menu"><span class="navicon">☷</span>Food Menu</button><button data-page="sales"><span class="navicon">▤</span>Sales & Reports</button><button data-page="settings"><span class="navicon">⚙</span>Settings / Admin</button></nav></aside><main id="main"></main></div></div>
 <script>
 const money=n=>'Rs. '+Number(n||0).toLocaleString('en-PK',{maximumFractionDigits:2});
@@ -48,157 +48,7 @@ function settingsPage(m){let l=license();m.innerHTML=`<div class="pagehead"><div
 function saveSettings(){db.name=document.getElementById('businessName').value.trim()||'AGHAI 21 PAKWAN CENTER';db.ownerPin=document.getElementById('ownerPin').value||'7860';db.currency=document.getElementById('currency').value;save();render();alert('Settings saved')}
 function makeCode(pin,days){return 'S'+btoa(pin+'|'+days+'|AGHAI').replace(/[^A-Z0-9]/gi,'').toUpperCase().slice(0,12)}function generateCode(){let pin=document.getElementById('licensePin').value;if(pin!==db.ownerPin){alert('Wrong owner PIN');return}let days=Math.max(1,Math.min(3650,Number(document.getElementById('licenseDays').value)||365));document.getElementById('generatedCode').value=makeCode(pin,days)}function copyCode(){let v=document.getElementById('generatedCode').value;if(v)navigator.clipboard?.writeText(v).then(()=>alert('Copied'));else alert('Pehle code generate karein')}
 function activateCode(){let code=document.getElementById('activationCode').value.trim();let valid=false;for(let d=1;d<=3650;d++)if(code===makeCode(db.ownerPin,d)){db.licenseUntil=Date.now()+d*86400000;valid=true;break}if(!valid){alert('Invalid activation code');return}save();alert('License activated');render()}
-function printBillById(id){let o=db.orders.find(x=>x.id===id);if(o)printBill(o)}function printBill(o){let w=window.open('','_blank','width=430,height=700');if(!w){alert('Popup allow karein');return}let rows=o.items.map(x=>`<tr><td>${x.name}<br><small>${x.ur} · ${x.ro}</small></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');w.document.write(`<!doctype html><html><head><title>${o.id}</title><style>body{font:13px Arial;padding:16px;color:#111}.logo{text-align:center;font:bold 38px Georgia;color:#17483d}.center{text-align:center}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{padding:7px 3px;border-bottom:1px dashed #aaa;text-align:left;font-size:12px}.right{text-align:right}.total{font-weight:bold;border-top:1px solid #111;padding-top:10px;margin-top:8px}.muted{color:#555;font-size:11px}</style></head><body><div class="logo">S</div><h2 class="center">${db.name}</h2><p class="center">${o.type} · ${o.id}</p><p class="center muted">${fmtDate(o.time)}<br>Customer: ${o.customer}</p><table><thead><tr><th>Item / آئٹم / Dish</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><p>Subtotal: <b class="right">${money(o.subtotal)}</b></p><p>Discount: ${money(o.discount)}</p><p>GST: ${money(o.gst)}</p><p class="total">Grand Total: <b>${money(o.total)}</b></p><p class="center">Thank you · شکریہ · Shukriya</p><p class="center muted">Powered by S</p><script>window.onload=()=>window.print()<\/script>
-<script>
-/* Rise Pakwan visual upgrade: preserves existing menu, rates, billing and settings. */
-(function(){
- const foodPhotos = [
-  ["biryani","https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=900&q=85"],
-  ["pulao","https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=85"],
-  ["rice","https://images.unsplash.com/photo-1516684732162-0c9ba3b4a6a2?auto=format&fit=crop&w=900&q=85"],
-  ["karahi","https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=900&q=85"],
-  ["handi","https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=900&q=85"],
-  ["nihari","https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=900&q=85"],
-  ["qorma","https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=900&q=85"],
-  ["kebab","https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85"],
-  ["tikka","https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=900&q=85"],
-  ["bbq","https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=85"],
-  ["sweet","https://images.unsplash.com/photo-甜?auto=format&fit=crop&w=900&q=85"],
-  ["drink","https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=85"],
-  ["raita","https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=900&q=85"],
-  ["burger","https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85"],
-  ["default","https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=900&q=85"]
- ];
- function photoFor(item){
-  const n=((item.en||"")+" "+(item.cat||"")).toLowerCase();
-  if(/biryani/.test(n))return foodPhotos[0][1];
-  if(/pulao/.test(n))return foodPhotos[1][1];
-  if(/rice|daal|dal/.test(n))return foodPhotos[2][1];
-  if(/karahi/.test(n))return foodPhotos[3][1];
-  if(/handi/.test(n))return foodPhotos[4][1];
-  if(/nihari/.test(n))return foodPhotos[5][1];
-  if(/qorma|salan|curry/.test(n))return foodPhotos[6][1];
-  if(/kebab|seekh/.test(n))return foodPhotos[7][1];
-  if(/tikka/.test(n))return foodPhotos[8][1];
-  if(/bbq|grill/.test(n))return foodPhotos[9][1];
-  if(/sweet|kheer|zarda|gulab|dessert/.test(n))return foodPhotos[10][1].replace("photo-甜","photo-1578985545062-69928b1d9587");
-  if(/drink|cola|juice/.test(n))return foodPhotos[11][1];
-  if(/raita|yogurt/.test(n))return foodPhotos[12][1];
-  if(/burger|sandwich|fast food|fries|roll/.test(n))return foodPhotos[13][1];
-  return foodPhotos[14][1];
- }
- const style=document.createElement("style");
- style.textContent=`
- :root{--site-primary:#123f35;--site-secondary:#e7bd63;--site-background:#0d1715;--surface:#192b26;--surface2:#244238;--line:#466557;--gold:#f0c96e;--green:#63d7a6}
- body{background:radial-gradient(ellipse at 50% -20%,#245848 0%,#101d19 48%,#0b1211 100%)}
- .app{position:relative;isolation:isolate;overflow:hidden;background:transparent}
- .app:before,.app:after{content:"";position:fixed;top:0;bottom:0;width:4px;z-index:20;pointer-events:none;background:linear-gradient(180deg,transparent,#eac46b,#5be0b0,#d17bff,#eac46b,transparent);background-size:100% 260%;animation:riseSideGlow 5s linear infinite;filter:drop-shadow(0 0 8px #eac46b)}
- .app:before{left:0}.app:after{right:0;animation-delay:-2.5s}
- @keyframes riseSideGlow{0%{background-position:0 0;opacity:.35}50%{opacity:1}100%{background-position:0 100%;opacity:.35}}
- .top{background:linear-gradient(105deg,#10382f,#1c5945 55%,#153e35);box-shadow:0 5px 28px #0007;border-bottom:1px solid #d6b15b88}
- .brand{gap:14px}.brand h1{font-size:clamp(23px,3vw,30px)!important;letter-spacing:.5px;text-shadow:0 0 10px #f2d27b66;animation:riseTitle 3.5s ease-in-out infinite}
- @keyframes riseTitle{0%,100%{text-shadow:0 0 7px #f2d27b44}50%{text-shadow:0 0 17px #f2d27baa,0 0 28px #5be0b066}}
- .logo{position:relative;animation:riseLogo 7s linear infinite;filter:drop-shadow(0 0 8px #e7bd63aa)}
- .logo:after{content:"";position:absolute;inset:-5px;border:1px solid #f0cd79;border-left-color:transparent;border-radius:50%;animation:riseLogo 4s linear infinite}
- @keyframes riseLogo{to{transform:rotate(360deg)}}
- .nav button.active,.nav button:hover{background:linear-gradient(100deg,#254c3f,#315c48);border-color:#d7b25d88;box-shadow:inset 3px 0 #edc66f,0 0 12px #d7b25d22}
- .panel,.stat,.dish{border-color:#48685a;box-shadow:0 10px 26px #0003,0 0 12px #4dc99b0a}
- .gold,.categoryrow button.active{background:linear-gradient(120deg,#f4d98d,#c99843)!important;color:#241b0d!important}
- .menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
- .dish{padding:0 0 12px;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
- .dish:hover{transform:translateY(-4px);border-color:#e7bd63;box-shadow:0 12px 26px #0006,0 0 17px #e7bd6330}
- .dish-photo{width:100%;height:150px;object-fit:cover;display:block;background:#263c33}
- .dish .dishname,.dish .sub,.dish .price,.dish .quick{margin-left:12px;margin-right:12px}
- .dish .dishname{font-size:15px;margin-top:3px}
- .dish .quick{display:flex;gap:7px}.dish .quick button{flex:1;margin-top:3px}
- @media(max-width:950px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dish-photo{height:140px}}
- @media(max-width:560px){.brand h1{font-size:21px!important}.brand small{font-size:9px;letter-spacing:1.3px}.dish-photo{height:118px}.dish .dishname{font-size:13px}.dish .sub{font-size:10px}.app:before,.app:after{width:3px}}
- @media(prefers-reduced-motion:reduce){.app:before,.app:after,.brand h1,.logo,.logo:after{animation:none!important}}
- `;
- document.head.appendChild(style);
- const oldMenuPage=window.menuPage;
- window.menuPage=function(m){
-  let list=db.items.filter(x=>(cat==='All'||x.cat===cat)&&[x.en,x.ur,x.ro,x.cat].join(' ').toLowerCase().includes(search.toLowerCase()));
-  m.innerHTML=`<div class="pagehead"><div><h2>${T('menu')}</h2><p class="muted">Har dish ki tasveer ke saath menu dekhein aur rates manage karein</p></div><div class="quick"><button class="gold" onclick="printMenu()">▤ ${T('menuPrint')}</button><button onclick="document.getElementById('addForm').classList.toggle('hidden')">＋ ${T('add')}</button></div></div><div class="panel hidden" id="addForm"><h3>${T('add')}</h3><div class="formgrid"><div class="field"><label>English Name</label><input id="newEn" placeholder="Chicken Biryani"></div><div class="field"><label>Urdu Name</label><input id="newUr" placeholder="چکن بریانی"></div><div class="field"><label>Roman Urdu</label><input id="newRo" placeholder="Chicken Biryani"></div><div class="field"><label>${T('category')}</label><select id="newCat">${cats.slice(1).map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>${T('price')} (Rs.)</label><input id="newPrice" type="number" min="0" value="100"></div><div class="field"><label>${T('portion')}</label><select id="newUnit"><option>plate</option><option>kg</option><option>gram</option><option>piece</option><option>packet</option><option>cup</option><option>tray</option><option>liter</option></select></div></div><button class="gold" onclick="addDish()">${T('save')}</button></div><div class="toolbar"><input placeholder="${T('search')}" value="${search}" oninput="search=this.value;menuPage(document.getElementById('main'))"><button class="soft" onclick="search='';menuPage(document.getElementById('main'))">Clear</button></div><div class="categoryrow">${cats.map(c=>`<button class="${cat===c?'active':''}" onclick="cat='${c}';menuPage(document.getElementById('main'))">${c}</button>`).join('')}</div><div class="menu-grid">${list.map(x=>`<div class="dish"><img class="dish-photo" src="${photoFor(x)}" alt="${x.en}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=900&q=80'"><div class="dishname">${dishName(x)}</div><div class="sub">${x.en} · ${x.cat} · ${x.portion||x.unit}</div><div class="price">${money(x.price)} / ${x.unit}</div><div class="quick"><button class="soft" onclick="editDish(${x.id})">Edit</button><button class="danger" onclick="deleteDish(${x.id})">Delete</button></div></div>`).join('')||'<div class="empty">No dishes found</div>'}</div>`;
- };
-})();
-</script>
-
-<script>
-// Small requested additions only: preserve the existing app and its workflows.
-(function(){
-  const themes={
-    emerald:{primary:'#153d35',secondary:'#d6a84f',bg:'#101a18',surface:'#1a2925',surface2:'#22352f',ink:'#f6f3e9',line:'#344b43'},
-    royal:{primary:'#253b70',secondary:'#e7bd65',bg:'#10172a',surface:'#1a2742',surface2:'#26385b',ink:'#f4f6ff',line:'#3b5077'},
-    burgundy:{primary:'#702d3c',secondary:'#e9bd75',bg:'#211318',surface:'#321d25',surface2:'#492733',ink:'#fff4f0',line:'#63404a'},
-    charcoal:{primary:'#30343b',secondary:'#70c7b0',bg:'#111418',surface:'#20262c',surface2:'#2c343c',ink:'#f2f5f7',line:'#414c55'}
-  };
-  function applyTheme(key){
-    const t=themes[key]||themes.emerald,root=document.documentElement.style;
-    root.setProperty('--site-primary',t.primary);root.setProperty('--site-secondary',t.secondary);
-    root.setProperty('--site-background',t.bg);root.setProperty('--surface',t.surface);
-    root.setProperty('--surface2',t.surface2);root.setProperty('--ink',t.ink);
-    root.setProperty('--line',t.line);db.theme=key;save();
-  }
-  applyTheme(db.theme||'emerald');
-  const style=document.createElement('style');
-  style.textContent=`
-    .top{position:sticky;overflow:hidden;background-image:linear-gradient(90deg,rgba(9,35,29,.96),rgba(9,35,29,.78)),url('https://images.unsplash.com/photo-1563379091339-03246963d96a?auto=format&fit=crop&w=1200&q=85');background-size:cover;background-position:center 48%}
-    .brand{min-width:0;flex:1}.brand h1{font-size:clamp(23px,3.4vw,34px)!important;letter-spacing:.5px;text-shadow:0 2px 14px #0009}
-    .logo{animation:aghaiLogoPulse 3s ease-in-out infinite}
-    @keyframes aghaiLogoPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px #e4bd69)}50%{transform:scale(1.07);filter:drop-shadow(0 0 10px #e4bd69)}}
-    .app:before,.app:after{content:"";position:fixed;top:0;bottom:0;width:4px;z-index:8;pointer-events:none;background:linear-gradient(180deg,transparent,var(--site-secondary),#54c49a,var(--site-secondary),transparent);background-size:100% 220%;animation:aghaiSideGlow 5s linear infinite}
-    .app:before{left:0}.app:after{right:0}
-    @keyframes aghaiSideGlow{to{background-position:0 220%}}
-    .dish-photo{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:11px;border:1px solid var(--line);display:block;background:var(--surface2)}
-    .dish{overflow:hidden}
-    @media(prefers-reduced-motion:reduce){.logo,.app:before,.app:after{animation:none}}
-  `;
-  document.head.appendChild(style);
-
-  const oldMenuPage=menuPage;
-  window.menuPage=function(m){
-    oldMenuPage(m);
-    const cards=m.querySelectorAll('.menu-grid .dish');
-    cards.forEach(card=>{
-      const name=(card.querySelector('.dishname')?.textContent||'').toLowerCase();
-      const sub=(card.querySelector('.sub')?.textContent||'').toLowerCase();
-      let photo='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80';
-      if(/biryani/.test(name))photo='https://images.unsplash.com/photo-1563379091339-03246963d96a?auto=format&fit=crop&w=700&q=80';
-      else if(/pulao|rice|chawal|zarda/.test(name))photo='https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=700&q=80';
-      else if(/karahi|handi|qorma|nihari|salan|curry/.test(name))photo='https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=700&q=80';
-      else if(/kebab|tikka|bbq/.test(name))photo='https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=700&q=80';
-      else if(/kheer|gulab|sweet|dessert/.test(name))photo='https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=700&q=80';
-      else if(/drink|cola|juice|lassi/.test(name))photo='https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=700&q=80';
-      else if(/roti|naan|paratha/.test(name))photo='https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=700&q=80';
-      const img=document.createElement('img');img.className='dish-photo';img.alt=name||'Food';img.loading='lazy';img.src=photo;
-      card.insertBefore(img,card.firstChild);
-    });
-  };
-  const oldSettingsPage=settingsPage;
-  window.settingsPage=function(m){
-    oldSettingsPage(m);
-    const panel=m.querySelector('.panel');
-    if(!panel||panel.querySelector('#aghaiTheme'))return;
-    const theme=document.createElement('div');theme.className='field';
-    theme.innerHTML='<label>Color Theme</label><select id="aghaiTheme"><option value="emerald">Emerald & Gold</option><option value="royal">Royal Blue</option><option value="burgundy">Burgundy Gold</option><option value="charcoal">Charcoal Mint</option></select>';
-    panel.querySelector('.quick')?.before(theme);
-    theme.querySelector('select').value=db.theme||'emerald';
-    const pin=panel.querySelector('#ownerPin');
-    if(pin){const toggle=document.createElement('button');toggle.type='button';toggle.className='soft';toggle.textContent='Show / Hide PIN';toggle.style.marginBottom='10px';toggle.onclick=()=>pin.type=pin.type==='password'?'text':'password';pin.parentElement.appendChild(toggle);}
-  };
-  window.saveSettings=function(){
-    const pin=document.getElementById('ownerPin')?.value.trim()||'';
-    if(!/^\d{4,12}$/.test(pin)){alert('PIN 4 se 12 digits ka hona chahiye');return;}
-    db.name=document.getElementById('businessName').value.trim()||'AGHAI PAKWAN CENTER';
-    db.ownerPin=pin;db.currency=document.getElementById('currency').value;
-    db.theme=document.getElementById('aghaiTheme')?.value||db.theme||'emerald';
-    save();applyTheme(db.theme);render();alert('Password aur theme save ho gaye');
-  };
-  render();
-})();
-</script>
-</body></html>`);w.document.close()}
+function printBillById(id){let o=db.orders.find(x=>x.id===id);if(o)printBill(o)}function printBill(o){let w=window.open('','_blank','width=430,height=700');if(!w){alert('Popup allow karein');return}let rows=o.items.map(x=>`<tr><td>${x.name}<br><small>${x.ur} · ${x.ro}</small></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');w.document.write(`<!doctype html><html><head><title>${o.id}</title><style>body{font:13px Arial;padding:16px;color:#111}.logo{text-align:center;font:bold 38px Georgia;color:#17483d}.center{text-align:center}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{padding:7px 3px;border-bottom:1px dashed #aaa;text-align:left;font-size:12px}.right{text-align:right}.total{font-weight:bold;border-top:1px solid #111;padding-top:10px;margin-top:8px}.muted{color:#555;font-size:11px}</style></head><body><div class="logo">S</div><h2 class="center">${db.name}</h2><p class="center">${o.type} · ${o.id}</p><p class="center muted">${fmtDate(o.time)}<br>Customer: ${o.customer}</p><table><thead><tr><th>Item / آئٹم / Dish</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><p>Subtotal: <b class="right">${money(o.subtotal)}</b></p><p>Discount: ${money(o.discount)}</p><p>GST: ${money(o.gst)}</p><p class="total">Grand Total: <b>${money(o.total)}</b></p><p class="center">Thank you · شکریہ · Shukriya</p><p class="center muted">Powered by S</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
 function printMenu(){let w=window.open('','_blank','width=800,height=700');if(!w){alert('Popup allow karein');return}w.document.write(`<html><head><title>Menu</title><style>body{font:14px Arial;padding:25px;color:#111}.logo{text-align:center;font:bold 42px Georgia;color:#17483d}h1{text-align:center}h2{border-bottom:1px solid #777;padding-bottom:5px} .item{display:flex;justify-content:space-between;border-bottom:1px dotted #aaa;padding:7px}.muted{font-size:11px;color:#555}</style></head><body><div class="logo">S</div><h1>${db.name} · MENU</h1>${cats.slice(1).map(c=>{let a=db.items.filter(x=>x.cat===c);return a.length?`<h2>${c}</h2>${a.map(x=>`<div class="item"><span>${x.en}<br><span class="muted">${x.ur} · ${x.ro}</span></span><b>${money(x.price)} / ${x.unit}</b></div>`).join('')}`:''}).join('')}<p style="text-align:center">Powered by S</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
 function exportCSV(){let rows=[['Bill','Date','Customer','Type','Items','Subtotal','Discount','GST','Total'],...db.orders.map(o=>[o.id,fmtDate(o.time),o.customer,o.type,o.items.map(x=>x.name+' x'+x.qty).join('; '),o.subtotal,o.discount,o.gst,o.total])];let csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='AGHAI-Pakwan-Sales.csv';a.click();URL.revokeObjectURL(a.href)}function backupData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='AGHAI-Pakwan-Backup.json';a.click();URL.revokeObjectURL(a.href)}function resetData(){if(confirm('Reset all demo data? This cannot be undone.')){localStorage.removeItem('aghaiPakwanDB');location.reload()}}
 render();
@@ -232,7 +82,7 @@ style.textContent=`
 @media(max-width:600px){.top{position:relative;align-items:flex-start;gap:8px;padding:10px}.brand{gap:7px}.brand h1{font-size:16px!important;line-height:1.2}.brand small{font-size:9px;letter-spacing:1px}.logo{width:34px;height:34px;font-size:20px}.topright{gap:4px}.langbar button{padding:6px;font-size:10px}.layout{display:block}aside{padding:5px}.nav button{padding:8px 10px;font-size:12px}.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.dish{padding:9px}.dish button{padding:8px}.pagehead{align-items:flex-start;flex-wrap:wrap}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:10px}.stat strong{font-size:19px}.formgrid{grid-template-columns:1fr}.posgrid>.panel{padding:11px}.cartline{grid-template-columns:minmax(0,1fr) auto}}
 `;
 document.head.appendChild(style);
-document.querySelector('.logo').textContent='S';
+document.querySelector('.logo').textContent='A';
 document.querySelector('#nav [data-page="counter"]').lastChild.textContent='Counter / Billing';
 const oldCounter=window.counter;
 window.counter=function(m){oldCounter(m);const side=m.querySelector('.posgrid > section:last-child');if(side){side.insertAdjacentHTML('afterbegin',`<div class="counter-config no-print"><b>Counter Settings</b><div class="configrow"><label><input type="checkbox" id="allowHalf" ${db.counterSettings.allowHalfKg?'checked':''}> Half Kg allow</label><label><input type="checkbox" id="allowQuarter" ${db.counterSettings.allowQuarterKg?'checked':''}> Quarter Kg allow</label><label>Receipt <select id="receiptWidth"><option value="58" ${db.counterSettings.receiptWidth==='58'?'selected':''}>58mm</option><option value="80" ${db.counterSettings.receiptWidth==='80'?'selected':''}>80mm</option><option value="a4" ${db.counterSettings.receiptWidth==='a4'?'selected':''}>A4</option></select></label></div></div>`);side.querySelector('#allowHalf').onchange=e=>{db.counterSettings.allowHalfKg=e.target.checked;save()};side.querySelector('#allowQuarter').onchange=e=>{db.counterSettings.allowQuarterKg=e.target.checked;save()};side.querySelector('#receiptWidth').onchange=e=>{db.counterSettings.receiptWidth=e.target.value;save()};}};
@@ -245,8 +95,6 @@ render();
 // Compact mobile menu: keep the complete category strip and dish cards on one screen.
 const compact=document.createElement('style');compact.textContent=`@media(max-width:600px){main{padding:8px!important}.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}.dish{padding:7px!important;gap:4px!important}.dish .dishname{font-size:12px}.dish .sub{font-size:9px}.dish .price{font-size:11px}.dish button{padding:6px!important;font-size:11px}.categoryrow{gap:5px;padding-bottom:7px}.categoryrow button{padding:7px 9px;font-size:10px}.pagehead{margin-bottom:9px}.pagehead h2{font-size:20px!important}.toolbar{gap:5px;margin-bottom:7px}.toolbar input{min-width:0;padding:8px}.stat{padding:8px!important}.stat strong{font-size:16px!important}.panel{padding:10px!important}.columns{gap:8px!important}}`;
 document.head.appendChild(compact);
-const brandFix=document.createElement('style');brandFix.textContent=`.logo{font-family:Georgia,serif!important;font-size:30px!important;font-weight:900!important;color:#f2cf78!important;background:radial-gradient(circle at 35% 25%,#315d4e,#10231d 72%);border:2px solid #e4bd69!important;border-radius:50%!important;text-shadow:0 2px 8px #e4bd69aa;box-shadow:0 0 0 3px #e4bd6922,0 0 22px #e4bd6966!important;flex:0 0 auto}.dish,.dish .quick,.dish .quick button{min-width:0;max-width:100%}.dish .quick{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:5px}.dish .quick button{width:100%;padding:7px 4px!important;font-size:11px;white-space:normal;overflow-wrap:anywhere;line-height:1.2}.dishname,.dish .sub,.dish .price{max-width:100%;overflow-wrap:anywhere;word-break:normal}.menu-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))!important}@media(max-width:600px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.dish .quick button{font-size:10px;padding:6px 2px!important}}`;
-document.head.appendChild(brandFix);
 const moreDishes=[
 ['Chana Biryani','Rice',280,'plate'],['Aloo Chana Biryani','Rice',300,'plate'],['Plain Biryani','Rice',230,'plate'],['Sada Pulao','Rice',220,'plate'],['Chicken Tikka Biryani','Rice',360,'plate'],['Masala Pulao','Rice',260,'plate'],['Matar Pulao','Rice',250,'plate'],['Yakhni Rice','Rice',240,'plate'],['Beef Biryani','Rice',380,'plate'],['Mutton Biryani','Rice',520,'plate'],['Vegetable Biryani','Rice',250,'plate'],['Chana Pulao','Rice',250,'plate'],
 ['Chicken Boneless Karahi','Karahi',1750,'kg'],['Lahori Karahi','Karahi',1700,'kg'],['Butter Chicken Karahi','Karahi',1800,'kg'],['Achari Chicken Karahi','Karahi',1700,'kg'],['Makhni Karahi','Karahi',1850,'kg'],['Mutton Namkeen Karahi','Karahi',3000,'kg'],['White Mutton Karahi','Karahi',3100,'kg'],['Afghani Karahi','Karahi',1900,'kg'],['Green Masala Karahi','Karahi',1750,'kg'],
@@ -262,65 +110,8 @@ function dashboard(m){let orders=todayOrders(),sales=totalSales(orders),all=db.o
 function printDashboard(){let a=todayOrders(),sum=totalSales(a),html=`<h1>${db.name}</h1><div class="meta">DASHBOARD SUMMARY · ${new Date().toLocaleString()}</div><div class="summary"><div><span>Today's Sales</span><b>${money(sum)}</b></div><div><span>Today's Bills</span><b>${a.length}</b></div><div><span>Average Bill</span><b>${money(a.length?sum/a.length:0)}</b></div><div><span>Menu Items</span><b>${db.items.length}</b></div><div><span>All-time Sales</span><b>${money(totalSales(db.orders))}</b></div><div><span>All-time Bills</span><b>${db.orders.length}</b></div></div><h2>Recent Bills</h2>${reportRows(db.orders.slice().reverse().slice(0,30))}`;printPreview('Dashboard','A4',html)}
 function salesPage(m){let sum=totalSales(db.orders);m.innerHTML=`<div class="pagehead"><div><h2>${T('sales')}</h2><p class="muted">Complete transaction history</p></div><div class="quick"><button class="soft" onclick="printSales()">Print View / PDF</button><button class="gold" onclick="exportCSV()">⇩ ${T('export')}</button></div></div><div class="grid"><div class="stat"><label>Total Revenue</label><strong>${money(sum)}</strong></div><div class="stat"><label>Total Bills</label><strong>${db.orders.length}</strong></div><div class="stat"><label>Discount Given</label><strong>${money(db.orders.reduce((s,o)=>s+o.discount,0))}</strong></div><div class="stat"><label>GST Collected</label><strong>${money(db.orders.reduce((s,o)=>s+o.gst,0))}</strong></div></div><section class="panel" style="margin-top:10px"><h3>${T('reports')}</h3>${ordersTable(db.orders.slice().reverse())}</section>`}
 function printSales(){let html=`<h1>${db.name}</h1><div class="meta">SALES REPORT · ${new Date().toLocaleString()}</div><div class="summary"><div><span>Total Sales</span><b>${money(totalSales(db.orders))}</b></div><div><span>Total Bills</span><b>${db.orders.length}</b></div><div><span>Total Discount</span><b>${money(db.orders.reduce((s,o)=>s+o.discount,0))}</b></div><div><span>GST Collected</span><b>${money(db.orders.reduce((s,o)=>s+o.gst,0))}</b></div></div><h2>Transaction Details</h2>${reportRows(db.orders.slice().reverse())}`;printPreview('Sales Report','A4',html)}
-function printBill(o){let rows=o.items.map(x=>`<tr><td>${x.name}<div style="font-size:9px;color:#555">${x.unit||''}</div></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');let html=`<div style="text-align:center;font:bold 34px Georgia;color:#17483d;margin-bottom:4px">S</div><h1>${db.name}</h1><div class="meta">${o.type} · ${o.id}<br>${fmtDate(o.time)}<br>${o.customer}</div><table><thead><tr><th>Item</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><div class="summary"><div><span>Subtotal</span><b>${money(o.subtotal)}</b></div><div><span>Discount</span><b>${money(o.discount)}</b></div><div><span>GST</span><b>${money(o.gst)}</b></div><div class="net"><span>NET TOTAL</span><b>${money(o.total)}</b></div></div><div class="billfoot">Thank you · Shukriya<br>Please visit again</div><div style="text-align:center;margin:14px auto 2px;border:2px double #17483d;border-radius:50%;width:92px;height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#17483d;transform:rotate(-8deg)"><b style="font:900 36px Georgia">S</b><b style="font-size:10px;letter-spacing:1px">APPROVED</b><small style="font-size:7px">AGHAI PAKWAN</small></div>`;printPreview('Bill '+o.id,db.counterSettings?.receiptWidth||'80',html)}
-function printMenu(){let html=`<div style="text-align:center;font:bold 38px Georgia;color:#17483d;margin-bottom:4px">S</div><h1>${db.name}</h1><div class="meta">MENU CARD · Rates in PKR</div>${cats.filter(c=>c!=='All').map(c=>{let a=db.items.filter(x=>x.cat===c);return a.length?`<h2>${c}</h2>${a.map(x=>`<div class="dishrow"><span>${x.en} <small>${x.ur||''}</small></span><b>${money(x.price)} / ${x.unit}</b></div>`).join('')}`:''}).join('')}<div style="text-align:center;margin:18px auto 4px;border:2px double #17483d;border-radius:50%;width:108px;height:108px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#17483d;transform:rotate(-8deg)"><b style="font:900 42px Georgia">S</b><b style="font-size:11px;letter-spacing:1px">APPROVED</b><small style="font-size:8px">AGHAI PAKWAN</small></div>`;printPreview('Menu Card','A4',html)}
+function printBill(o){let rows=o.items.map(x=>`<tr><td>${x.name}<div style="font-size:9px;color:#555">${x.unit||''}</div></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');let html=`<h1>${db.name}</h1><div class="meta">${o.type} · ${o.id}<br>${fmtDate(o.time)}<br>${o.customer}</div><table><thead><tr><th>Item</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><div class="summary"><div><span>Subtotal</span><b>${money(o.subtotal)}</b></div><div><span>Discount</span><b>${money(o.discount)}</b></div><div><span>GST</span><b>${money(o.gst)}</b></div><div class="net"><span>NET TOTAL</span><b>${money(o.total)}</b></div></div><div class="billfoot">Thank you · Shukriya<br>Please visit again</div>`;printPreview('Bill '+o.id,db.counterSettings?.receiptWidth||'80',html)}
+function printMenu(){let html=`<h1>${db.name}</h1><div class="meta">MENU CARD · Rates in PKR</div>${cats.filter(c=>c!=='All').map(c=>{let a=db.items.filter(x=>x.cat===c);return a.length?`<h2>${c}</h2>${a.map(x=>`<div class="dishrow"><span>${x.en} <small>${x.ur||''}</small></span><b>${money(x.price)} / ${x.unit}</b></div>`).join('')}`:''}).join('')}`;printPreview('Menu Card','A4',html)}
 render();
-</script>
-<script>
-// Simple customer edition: no trial expiry or activation workflow.
-if(!db.ownerPin || db.ownerPin==='7860') db.ownerPin='582641';
-save();
-function license(){document.getElementById('licenseBadge').textContent='OWNER PIN PROTECTED';return {left:0,active:true,blocked:false}}
-const originalShowPage=showPage;
-window.showPage=function(p){
-  if((p==='settings'||p==='menu')&&!window._aghaiOwnerAccess){
-    const pin=prompt('Owner PIN darj karein');
-    if(pin!==db.ownerPin){if(pin!==null)alert('Ghalat PIN');return;}
-    window._aghaiOwnerAccess=true;
-  }
-  originalShowPage(p);
-  if(p!=='settings'&&p!=='menu')window._aghaiOwnerAccess=false;
-};
-function settingsPage(m){
-  m.innerHTML=`<div class="pagehead"><div><h2>Owner Settings</h2><p class="muted">Sirf owner business aur menu settings badal sakta hai</p></div><span class="tag">PIN PROTECTED</span></div>
-  <section class="panel" style="max-width:650px"><h3>Business Profile</h3>
-  <div class="field"><label>Business Name</label><input id="businessName" value="${db.name}"></div>
-  <div class="field"><label>Currency</label><select id="currency"><option ${db.currency==='Rs.'?'selected':''}>Rs.</option><option ${db.currency==='PKR'?'selected':''}>PKR</option></select></div>
-  <div class="field"><label>New Owner PIN (6 digits recommended)</label><input id="ownerPin" type="password" inputmode="numeric" maxlength="12" value="${db.ownerPin}"></div>
-  <div class="quick"><button class="gold" onclick="saveSettings()">Save Settings</button><button class="soft" onclick="backupData()">Download Backup</button></div>
-  <p class="muted" style="font-size:11px;margin-top:12px">PIN kisi ke sath share na karein. Data isi device ke browser mein save hota hai.</p></section>`;
-}
-function saveSettings(){
-  const pin=document.getElementById('ownerPin').value.trim();
-  if(!/^\d{4,12}$/.test(pin)){alert('PIN 4 se 12 digits ka hona chahiye');return;}
-  db.name=document.getElementById('businessName').value.trim()||'AGHAI PAKWAN CENTER';
-  db.ownerPin=pin;db.currency=document.getElementById('currency').value;save();render();alert('Settings save ho gayi');
-}
-render();
-</script>
-<script>
-// Final presentation and print refinements for AGHAI PAKWAN.
-const aghaiSmartLogo=`<svg viewBox="0 0 100 100" role="img" aria-label="AGHAI smart S logo"><defs><linearGradient id="aghaiGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0ad"/><stop offset=".48" stop-color="#e4bd69"/><stop offset="1" stop-color="#9b6824"/></linearGradient></defs><circle cx="50" cy="50" r="46" fill="#123b32" stroke="url(#aghaiGold)" stroke-width="4"/><circle cx="50" cy="50" r="39" fill="none" stroke="#e4bd69" stroke-opacity=".5" stroke-width="1.5"/><path d="M68 29C61 20 37 20 31 33c-9 18 35 15 38 32 3 18-27 24-43 10" fill="none" stroke="url(#aghaiGold)" stroke-width="11" stroke-linecap="round"/><path d="M68 29C61 20 37 20 31 33c-9 18 35 15 38 32 3 18-27 24-43 10" fill="none" stroke="#fff4c9" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/></svg>`;
-const aghaiLogoCSS=`.logo{font-size:0!important;border-radius:50%!important;background:transparent!important;border:0!important;box-shadow:0 0 18px #e4bd6977!important;overflow:visible!important}.logo svg{display:block;width:100%;height:100%}.dish .dishname,.categoryrow button{text-align:center;overflow-wrap:anywhere;white-space:normal;line-height:1.25}.dish{align-items:stretch;text-align:center;min-width:0}.dish .sub,.dish .price{text-align:center;overflow-wrap:anywhere}.categoryrow{align-items:stretch;flex-wrap:wrap;overflow:visible}.categoryrow button{flex:0 1 auto;max-width:100%;min-width:68px;padding:9px 12px}.menu-grid{align-items:stretch}.bill-brand{display:flex;justify-content:center;margin:0 auto 7px;width:78px;height:78px}.bill-brand svg{width:100%;height:100%}.bill-paper{background:linear-gradient(145deg,#fffdf4 0%,#fff 48%,#f4ead2 100%);border:2px solid #b58a3d;border-radius:12px;padding:14px;print-color-adjust:exact;-webkit-print-color-adjust:exact}.bill-paper h1{color:#17483d}.bill-paper .bill-band{background:linear-gradient(90deg,#123b32,#236b55,#123b32);color:#fff;text-align:center;padding:7px;margin:8px -14px;print-color-adjust:exact;-webkit-print-color-adjust:exact}.bill-paper .summary .net{background:#f2e3bd;color:#173d35;padding:8px;print-color-adjust:exact;-webkit-print-color-adjust:exact}@media print{.bill-paper{background:linear-gradient(145deg,#fffdf4,#fff 48%,#f4ead2)!important;print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}.bill-paper .bill-band,.bill-paper .summary .net{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.categoryrow button{white-space:normal!important}}`;
-const finalStyle=document.createElement('style');finalStyle.textContent=aghaiLogoCSS;document.head.appendChild(finalStyle);
-document.querySelectorAll('.logo').forEach(el=>el.innerHTML=aghaiSmartLogo);
-const previousDashboard=dashboard;
-dashboard=function(m){previousDashboard(m);const chart=m.querySelector('.columns .panel');if(chart){chart.style.minWidth='0';chart.style.overflow='hidden';chart.insertAdjacentHTML('beforeend',`<p class="muted" style="font-size:11px;margin-top:28px">Daily sales graph · Last 7 days</p>`);}const head=m.querySelector('.pagehead');if(head&&!head.querySelector('[data-dashboard-print]'))head.querySelector('.quick')?.insertAdjacentHTML('afterbegin','<button class="soft" data-dashboard-print onclick="printDashboard()">Print Dashboard / PDF</button>');};
-function printDashboard(){const daily=Array.from({length:7},(_,i)=>{const d=new Date(Date.now()-(6-i)*86400000);const amount=totalSales(db.orders.filter(o=>new Date(o.time).toDateString()===d.toDateString()));return {day:d.toLocaleDateString('en',{weekday:'short'}),amount};});const max=Math.max(1,...daily.map(x=>x.amount));const graph=daily.map(x=>`<div style="flex:1;min-width:0;text-align:center"><div style="height:130px;display:flex;align-items:end;background:#f2ead8;border-radius:7px 7px 0 0;overflow:hidden"><div style="width:100%;height:${Math.max(3,x.amount/max*100)}%;background:linear-gradient(0deg,#17483d,#d6a84f);print-color-adjust:exact;-webkit-print-color-adjust:exact"></div></div><small>${x.day}</small><div style="font-size:9px;overflow-wrap:anywhere">${money(x.amount)}</div></div>`).join('');const today=todayOrders(),sales=totalSales(today);const html=`<div class="bill-brand">${aghaiSmartLogo}</div><h1>${db.name}</h1><div class="meta">BUSINESS DASHBOARD · ${new Date().toLocaleString()}</div><div class="summary"><div><span>Today's Sales</span><b>${money(sales)}</b></div><div><span>Today's Orders</span><b>${today.length}</b></div><div><span>Average Bill</span><b>${money(today.length?sales/today.length:0)}</b></div><div><span>Menu Items</span><b>${db.items.length}</b></div><div><span>All-time Sales</span><b>${money(totalSales(db.orders))}</b></div><div><span>Total Bills</span><b>${db.orders.length}</b></div></div><h2>7-Day Sales Graph</h2><div style="display:flex;gap:8px;align-items:end;margin:10px 0 18px">${graph}</div><h2>Recent Bills</h2>${reportRows(db.orders.slice().reverse().slice(0,30))}`;printPreview('AGHAI Dashboard','A4',html);}
-function printBill(o){const rows=o.items.map(x=>`<tr><td>${x.name}<div class="muted">${x.unit||''}</div></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');const html=`<div class="bill-paper" style="border:1.5px solid #b58a3d;border-radius:9px;padding:9px;background:#fffdf7"><div class="bill-brand" style="width:34px;height:34px;margin:0 auto 3px">${aghaiSmartLogo}</div><h1 style="font:700 15px Georgia;color:#17483d;margin:2px 0">${db.name}</h1><div class="bill-band" style="margin:5px -9px;padding:5px;font-size:10px;letter-spacing:1px">${o.type} · BILL ${o.id}</div><div class="meta" style="font-size:9px;margin:5px 0">${fmtDate(o.time)}<br>Customer: ${o.customer}</div><table><thead><tr><th>Item</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><div class="summary"><div><span>Subtotal</span><b>${money(o.subtotal)}</b></div><div><span>Discount</span><b>${money(o.discount)}</b></div><div><span>GST</span><b>${money(o.gst)}</b></div><div class="net"><span>NET TOTAL</span><b>${money(o.total)}</b></div></div><div class="billfoot">Thank you · Shukriya<br>Please visit again</div></div>`;printPreview('AGHAI Bill '+o.id,db.counterSettings?.receiptWidth||'80',html);}
-function printMenu(){const groups=cats.filter(c=>c!=='All').map(c=>{const a=db.items.filter(x=>x.cat===c);return a.length?`<section class="menu-section"><h2>${c}</h2>${a.map(x=>`<div class="menu-item"><div class="menu-dish"><b>${x.en}</b><small>${x.ur||''}</small></div><div class="menu-price">${money(x.price)}<small>/ ${x.unit}</small></div></div>`).join('')}</section>`:''}).join('');const html=`<div class="menu-card"><header class="menu-cover"><div class="bill-brand" style="width:48px;height:48px;margin:0 auto 7px">${aghaiSmartLogo}</div><div class="menu-kicker">AGHAI PAKWAN CENTER</div><h1>${db.name}</h1><div class="menu-subtitle">FRESH • DELICIOUS • MADE WITH CARE</div><div class="menu-ribbon">MENU CARD</div></header><div class="menu-catalog">${groups}</div><footer class="menu-footer">Thank you for choosing us · Shukriya</footer></div><style>.menu-card{border:2px solid #b58a3d;border-radius:12px;padding:12px;background:linear-gradient(150deg,#fffdf6,#fff 60%,#f8f0df);color:#193d33}.menu-cover{text-align:center;padding:7px 5px 13px;border-bottom:2px solid #c49a4c}.menu-cover h1{font:700 22px Georgia,serif;color:#17483d;margin:3px 0}.menu-kicker{font-size:9px;letter-spacing:3px;color:#a77a32;font-weight:bold}.menu-subtitle{font-size:8px;letter-spacing:1.5px;color:#66776d}.menu-ribbon{display:inline-block;margin-top:10px;padding:5px 24px;background:#17483d;color:#f7e6b8;border:1px solid #c49a4c;letter-spacing:3px;font:700 11px Georgia}.menu-catalog{display:grid;grid-template-columns:1fr 1fr;gap:9px 15px;padding:12px 4px}.menu-section{break-inside:avoid}.menu-section h2{margin:0 0 5px;padding:5px 7px;background:#17483d;color:#f8e7bd;border-radius:4px;font:700 11px Georgia;letter-spacing:.7px}.menu-item{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:5px 2px;border-bottom:1px dotted #c9b98f}.menu-dish{min-width:0}.menu-dish b{display:block;font-size:10px;color:#203b32}.menu-dish small{display:block;font-size:9px;color:#8a6a37;margin-top:2px}.menu-price{white-space:nowrap;text-align:right;font-size:10px;font-weight:bold;color:#9a6d24}.menu-price small{display:block;font-size:8px;color:#777;font-weight:normal}.menu-footer{text-align:center;border-top:1px solid #c49a4c;padding:9px 2px 2px;font:italic 10px Georgia;color:#87642b}@media print{.menu-card{print-color-adjust:exact;-webkit-print-color-adjust:exact}.menu-section{break-inside:avoid}}@media(max-width:500px){.menu-catalog{grid-template-columns:1fr}}</style>`;printPreview('AGHAI Menu Card','A4',html);}
-render();
-</script>
-<script>
-(function(){
-const pics={bbq:"https://images.unsplash.com/photo-1544025162-d76694265947?w=600",rice:"https://images.unsplash.com/photo-1563379091339-03246963d96a?w=600",salan:"https://images.unsplash.com/photo-1547592180-85f173990554?w=600",sweet:"https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600",karahi:"https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=600",food:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600"};
-function dishPic(n,c){let v=(n+" "+(c||"")).toLowerCase();if(/biryani|pulao|rice|chawal/.test(v))return pics.rice;if(/nihari|paya|salan|qorma/.test(v))return pics.salan;if(/bbq|kebab|tikka/.test(v))return pics.bbq;if(/sweet|gulab|kheer|zarda/.test(v))return pics.sweet;if(/karahi|handi/.test(v))return pics.karahi;return pics.food}
-const st=document.createElement("style");st.textContent='.top .brand{flex:1 1 600px;max-width:none;gap:12px}.top .brand h1{font-size:clamp(19px,2.4vw,30px);white-space:nowrap}.top .brand:after{content:"";display:block;flex:1;min-width:150px;height:62px;border-radius:10px;background-image:url('+pics.bbq+'),url('+pics.rice+'),url('+pics.salan+'),url('+pics.sweet+');background-size:25% 100%;background-position:0 0,33.3% 0,66.6% 0,100% 0;background-repeat:no-repeat;border:1px solid #c49a4c}.dish-photo{width:100%;height:112px;object-fit:cover;border-radius:9px;margin-bottom:8px}.bill-paper{background:linear-gradient(#fffdf4e8,#fffdf4e8),url('+pics.rice+') center/cover!important}.aghai-theme-royal{--aghai-bg:#eaf0fb;--aghai-panel:#fff;--aghai-accent:#244f91}.aghai-theme-burgundy{--aghai-bg:#f7e9e9;--aghai-panel:#fffaf8;--aghai-accent:#852d3a}.aghai-theme-emerald{--aghai-bg:#eaf3ed;--aghai-panel:#fff;--aghai-accent:#17483d}.aghai-theme-charcoal{--aghai-bg:#202a2b;--aghai-panel:#2c3939;--aghai-accent:#83b7a1}body.aghai-themed{background:var(--aghai-bg)!important}body.aghai-themed .panel,body.aghai-themed .stat,body.aghai-themed .dish{background:var(--aghai-panel)!important}body.aghai-themed button.gold,body.aghai-themed .categoryrow button.active{background:var(--aghai-accent)!important}@media(max-width:600px){.top .brand{flex-wrap:wrap}.top .brand:after{flex-basis:100%;height:48px}.top .brand h1{white-space:normal}}';document.head.appendChild(st);
-const oldSettings=settingsPage;settingsPage=function(m){oldSettings(m);let p=m.querySelector(".panel");if(!p||document.getElementById("aghaiTheme"))return;let f=document.createElement("div");f.className="field";f.innerHTML='<label>Theme / Colors</label><select id="aghaiTheme"><option value="emerald">Emerald & Gold</option><option value="royal">Royal Blue</option><option value="burgundy">Burgundy Gold</option><option value="charcoal">Charcoal Mint</option></select>';p.querySelector(".quick").before(f);document.getElementById("aghaiTheme").value=db.theme||"emerald";let pin=document.getElementById("ownerPin");if(pin)pin.insertAdjacentHTML("afterend",'<button type="button" class="soft" onclick="let p=document.getElementById(\'ownerPin\');p.type=p.type===\'password\'?\'text\':\'password\'">Show / Hide PIN</button>')};
-const oldSave=saveSettings;saveSettings=function(){let t=document.getElementById("aghaiTheme");if(t)db.theme=t.value;oldSave();applyAghaiTheme()};
-function applyAghaiTheme(){document.body.className=document.body.className.replace(/aghai-theme-\w+/g,"");document.body.classList.add("aghai-themed","aghai-theme-"+(db.theme||"emerald"))}
-const oldMenu=menuPage;menuPage=function(m){oldMenu(m);m.querySelectorAll(".dish").forEach(d=>{if(d.querySelector(".dish-photo"))return;let n=d.querySelector(".dishname")?.textContent||"",c=d.querySelector(".sub")?.textContent||"";let i=document.createElement("img");i.className="dish-photo";i.alt=n;i.loading="lazy";i.src=dishPic(n,c);d.prepend(i)})};
-applyAghaiTheme();
-})();
 </script>
 </body></html>
