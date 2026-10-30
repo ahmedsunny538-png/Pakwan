@@ -48,7 +48,82 @@ function settingsPage(m){let l=license();m.innerHTML=`<div class="pagehead"><div
 function saveSettings(){db.name=document.getElementById('businessName').value.trim()||'AGHAI 21 PAKWAN CENTER';db.ownerPin=document.getElementById('ownerPin').value||'7860';db.currency=document.getElementById('currency').value;save();render();alert('Settings saved')}
 function makeCode(pin,days){return 'S'+btoa(pin+'|'+days+'|AGHAI').replace(/[^A-Z0-9]/gi,'').toUpperCase().slice(0,12)}function generateCode(){let pin=document.getElementById('licensePin').value;if(pin!==db.ownerPin){alert('Wrong owner PIN');return}let days=Math.max(1,Math.min(3650,Number(document.getElementById('licenseDays').value)||365));document.getElementById('generatedCode').value=makeCode(pin,days)}function copyCode(){let v=document.getElementById('generatedCode').value;if(v)navigator.clipboard?.writeText(v).then(()=>alert('Copied'));else alert('Pehle code generate karein')}
 function activateCode(){let code=document.getElementById('activationCode').value.trim();let valid=false;for(let d=1;d<=3650;d++)if(code===makeCode(db.ownerPin,d)){db.licenseUntil=Date.now()+d*86400000;valid=true;break}if(!valid){alert('Invalid activation code');return}save();alert('License activated');render()}
-function printBillById(id){let o=db.orders.find(x=>x.id===id);if(o)printBill(o)}function printBill(o){let w=window.open('','_blank','width=430,height=700');if(!w){alert('Popup allow karein');return}let rows=o.items.map(x=>`<tr><td>${x.name}<br><small>${x.ur} · ${x.ro}</small></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');w.document.write(`<!doctype html><html><head><title>${o.id}</title><style>body{font:13px Arial;padding:16px;color:#111}.logo{text-align:center;font:bold 38px Georgia;color:#17483d}.center{text-align:center}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{padding:7px 3px;border-bottom:1px dashed #aaa;text-align:left;font-size:12px}.right{text-align:right}.total{font-weight:bold;border-top:1px solid #111;padding-top:10px;margin-top:8px}.muted{color:#555;font-size:11px}</style></head><body><div class="logo">S</div><h2 class="center">${db.name}</h2><p class="center">${o.type} · ${o.id}</p><p class="center muted">${fmtDate(o.time)}<br>Customer: ${o.customer}</p><table><thead><tr><th>Item / آئٹم / Dish</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><p>Subtotal: <b class="right">${money(o.subtotal)}</b></p><p>Discount: ${money(o.discount)}</p><p>GST: ${money(o.gst)}</p><p class="total">Grand Total: <b>${money(o.total)}</b></p><p class="center">Thank you · شکریہ · Shukriya</p><p class="center muted">Powered by S</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
+function printBillById(id){let o=db.orders.find(x=>x.id===id);if(o)printBill(o)}function printBill(o){let w=window.open('','_blank','width=430,height=700');if(!w){alert('Popup allow karein');return}let rows=o.items.map(x=>`<tr><td>${x.name}<br><small>${x.ur} · ${x.ro}</small></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');w.document.write(`<!doctype html><html><head><title>${o.id}</title><style>body{font:13px Arial;padding:16px;color:#111}.logo{text-align:center;font:bold 38px Georgia;color:#17483d}.center{text-align:center}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{padding:7px 3px;border-bottom:1px dashed #aaa;text-align:left;font-size:12px}.right{text-align:right}.total{font-weight:bold;border-top:1px solid #111;padding-top:10px;margin-top:8px}.muted{color:#555;font-size:11px}</style></head><body><div class="logo">S</div><h2 class="center">${db.name}</h2><p class="center">${o.type} · ${o.id}</p><p class="center muted">${fmtDate(o.time)}<br>Customer: ${o.customer}</p><table><thead><tr><th>Item / آئٹم / Dish</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><p>Subtotal: <b class="right">${money(o.subtotal)}</b></p><p>Discount: ${money(o.discount)}</p><p>GST: ${money(o.gst)}</p><p class="total">Grand Total: <b>${money(o.total)}</b></p><p class="center">Thank you · شکریہ · Shukriya</p><p class="center muted">Powered by S</p><script>window.onload=()=>window.print()<\/script>
+<script>
+/* Rise Pakwan visual upgrade: preserves existing menu, rates, billing and settings. */
+(function(){
+ const foodPhotos = [
+  ["biryani","https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=900&q=85"],
+  ["pulao","https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=85"],
+  ["rice","https://images.unsplash.com/photo-1516684732162-0c9ba3b4a6a2?auto=format&fit=crop&w=900&q=85"],
+  ["karahi","https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=900&q=85"],
+  ["handi","https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=900&q=85"],
+  ["nihari","https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=900&q=85"],
+  ["qorma","https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=900&q=85"],
+  ["kebab","https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85"],
+  ["tikka","https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=900&q=85"],
+  ["bbq","https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=85"],
+  ["sweet","https://images.unsplash.com/photo-甜?auto=format&fit=crop&w=900&q=85"],
+  ["drink","https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=85"],
+  ["raita","https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=900&q=85"],
+  ["burger","https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85"],
+  ["default","https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=900&q=85"]
+ ];
+ function photoFor(item){
+  const n=((item.en||"")+" "+(item.cat||"")).toLowerCase();
+  if(/biryani/.test(n))return foodPhotos[0][1];
+  if(/pulao/.test(n))return foodPhotos[1][1];
+  if(/rice|daal|dal/.test(n))return foodPhotos[2][1];
+  if(/karahi/.test(n))return foodPhotos[3][1];
+  if(/handi/.test(n))return foodPhotos[4][1];
+  if(/nihari/.test(n))return foodPhotos[5][1];
+  if(/qorma|salan|curry/.test(n))return foodPhotos[6][1];
+  if(/kebab|seekh/.test(n))return foodPhotos[7][1];
+  if(/tikka/.test(n))return foodPhotos[8][1];
+  if(/bbq|grill/.test(n))return foodPhotos[9][1];
+  if(/sweet|kheer|zarda|gulab|dessert/.test(n))return foodPhotos[10][1].replace("photo-甜","photo-1578985545062-69928b1d9587");
+  if(/drink|cola|juice/.test(n))return foodPhotos[11][1];
+  if(/raita|yogurt/.test(n))return foodPhotos[12][1];
+  if(/burger|sandwich|fast food|fries|roll/.test(n))return foodPhotos[13][1];
+  return foodPhotos[14][1];
+ }
+ const style=document.createElement("style");
+ style.textContent=`
+ :root{--site-primary:#123f35;--site-secondary:#e7bd63;--site-background:#0d1715;--surface:#192b26;--surface2:#244238;--line:#466557;--gold:#f0c96e;--green:#63d7a6}
+ body{background:radial-gradient(ellipse at 50% -20%,#245848 0%,#101d19 48%,#0b1211 100%)}
+ .app{position:relative;isolation:isolate;overflow:hidden;background:transparent}
+ .app:before,.app:after{content:"";position:fixed;top:0;bottom:0;width:4px;z-index:20;pointer-events:none;background:linear-gradient(180deg,transparent,#eac46b,#5be0b0,#d17bff,#eac46b,transparent);background-size:100% 260%;animation:riseSideGlow 5s linear infinite;filter:drop-shadow(0 0 8px #eac46b)}
+ .app:before{left:0}.app:after{right:0;animation-delay:-2.5s}
+ @keyframes riseSideGlow{0%{background-position:0 0;opacity:.35}50%{opacity:1}100%{background-position:0 100%;opacity:.35}}
+ .top{background:linear-gradient(105deg,#10382f,#1c5945 55%,#153e35);box-shadow:0 5px 28px #0007;border-bottom:1px solid #d6b15b88}
+ .brand{gap:14px}.brand h1{font-size:clamp(23px,3vw,30px)!important;letter-spacing:.5px;text-shadow:0 0 10px #f2d27b66;animation:riseTitle 3.5s ease-in-out infinite}
+ @keyframes riseTitle{0%,100%{text-shadow:0 0 7px #f2d27b44}50%{text-shadow:0 0 17px #f2d27baa,0 0 28px #5be0b066}}
+ .logo{position:relative;animation:riseLogo 7s linear infinite;filter:drop-shadow(0 0 8px #e7bd63aa)}
+ .logo:after{content:"";position:absolute;inset:-5px;border:1px solid #f0cd79;border-left-color:transparent;border-radius:50%;animation:riseLogo 4s linear infinite}
+ @keyframes riseLogo{to{transform:rotate(360deg)}}
+ .nav button.active,.nav button:hover{background:linear-gradient(100deg,#254c3f,#315c48);border-color:#d7b25d88;box-shadow:inset 3px 0 #edc66f,0 0 12px #d7b25d22}
+ .panel,.stat,.dish{border-color:#48685a;box-shadow:0 10px 26px #0003,0 0 12px #4dc99b0a}
+ .gold,.categoryrow button.active{background:linear-gradient(120deg,#f4d98d,#c99843)!important;color:#241b0d!important}
+ .menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .dish{padding:0 0 12px;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+ .dish:hover{transform:translateY(-4px);border-color:#e7bd63;box-shadow:0 12px 26px #0006,0 0 17px #e7bd6330}
+ .dish-photo{width:100%;height:150px;object-fit:cover;display:block;background:#263c33}
+ .dish .dishname,.dish .sub,.dish .price,.dish .quick{margin-left:12px;margin-right:12px}
+ .dish .dishname{font-size:15px;margin-top:3px}
+ .dish .quick{display:flex;gap:7px}.dish .quick button{flex:1;margin-top:3px}
+ @media(max-width:950px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dish-photo{height:140px}}
+ @media(max-width:560px){.brand h1{font-size:21px!important}.brand small{font-size:9px;letter-spacing:1.3px}.dish-photo{height:118px}.dish .dishname{font-size:13px}.dish .sub{font-size:10px}.app:before,.app:after{width:3px}}
+ @media(prefers-reduced-motion:reduce){.app:before,.app:after,.brand h1,.logo,.logo:after{animation:none!important}}
+ `;
+ document.head.appendChild(style);
+ const oldMenuPage=window.menuPage;
+ window.menuPage=function(m){
+  let list=db.items.filter(x=>(cat==='All'||x.cat===cat)&&[x.en,x.ur,x.ro,x.cat].join(' ').toLowerCase().includes(search.toLowerCase()));
+  m.innerHTML=`<div class="pagehead"><div><h2>${T('menu')}</h2><p class="muted">Har dish ki tasveer ke saath menu dekhein aur rates manage karein</p></div><div class="quick"><button class="gold" onclick="printMenu()">▤ ${T('menuPrint')}</button><button onclick="document.getElementById('addForm').classList.toggle('hidden')">＋ ${T('add')}</button></div></div><div class="panel hidden" id="addForm"><h3>${T('add')}</h3><div class="formgrid"><div class="field"><label>English Name</label><input id="newEn" placeholder="Chicken Biryani"></div><div class="field"><label>Urdu Name</label><input id="newUr" placeholder="چکن بریانی"></div><div class="field"><label>Roman Urdu</label><input id="newRo" placeholder="Chicken Biryani"></div><div class="field"><label>${T('category')}</label><select id="newCat">${cats.slice(1).map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>${T('price')} (Rs.)</label><input id="newPrice" type="number" min="0" value="100"></div><div class="field"><label>${T('portion')}</label><select id="newUnit"><option>plate</option><option>kg</option><option>gram</option><option>piece</option><option>packet</option><option>cup</option><option>tray</option><option>liter</option></select></div></div><button class="gold" onclick="addDish()">${T('save')}</button></div><div class="toolbar"><input placeholder="${T('search')}" value="${search}" oninput="search=this.value;menuPage(document.getElementById('main'))"><button class="soft" onclick="search='';menuPage(document.getElementById('main'))">Clear</button></div><div class="categoryrow">${cats.map(c=>`<button class="${cat===c?'active':''}" onclick="cat='${c}';menuPage(document.getElementById('main'))">${c}</button>`).join('')}</div><div class="menu-grid">${list.map(x=>`<div class="dish"><img class="dish-photo" src="${photoFor(x)}" alt="${x.en}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=900&q=80'"><div class="dishname">${dishName(x)}</div><div class="sub">${x.en} · ${x.cat} · ${x.portion||x.unit}</div><div class="price">${money(x.price)} / ${x.unit}</div><div class="quick"><button class="soft" onclick="editDish(${x.id})">Edit</button><button class="danger" onclick="deleteDish(${x.id})">Delete</button></div></div>`).join('')||'<div class="empty">No dishes found</div>'}</div>`;
+ };
+})();
+</script>
+</body></html>`);w.document.close()}
 function printMenu(){let w=window.open('','_blank','width=800,height=700');if(!w){alert('Popup allow karein');return}w.document.write(`<html><head><title>Menu</title><style>body{font:14px Arial;padding:25px;color:#111}.logo{text-align:center;font:bold 42px Georgia;color:#17483d}h1{text-align:center}h2{border-bottom:1px solid #777;padding-bottom:5px} .item{display:flex;justify-content:space-between;border-bottom:1px dotted #aaa;padding:7px}.muted{font-size:11px;color:#555}</style></head><body><div class="logo">S</div><h1>${db.name} · MENU</h1>${cats.slice(1).map(c=>{let a=db.items.filter(x=>x.cat===c);return a.length?`<h2>${c}</h2>${a.map(x=>`<div class="item"><span>${x.en}<br><span class="muted">${x.ur} · ${x.ro}</span></span><b>${money(x.price)} / ${x.unit}</b></div>`).join('')}`:''}).join('')}<p style="text-align:center">Powered by S</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
 function exportCSV(){let rows=[['Bill','Date','Customer','Type','Items','Subtotal','Discount','GST','Total'],...db.orders.map(o=>[o.id,fmtDate(o.time),o.customer,o.type,o.items.map(x=>x.name+' x'+x.qty).join('; '),o.subtotal,o.discount,o.gst,o.total])];let csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='AGHAI-Pakwan-Sales.csv';a.click();URL.revokeObjectURL(a.href)}function backupData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='AGHAI-Pakwan-Backup.json';a.click();URL.revokeObjectURL(a.href)}function resetData(){if(confirm('Reset all demo data? This cannot be undone.')){localStorage.removeItem('aghaiPakwanDB');location.reload()}}
 render();
