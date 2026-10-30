@@ -123,6 +123,82 @@ function printBillById(id){let o=db.orders.find(x=>x.id===id);if(o)printBill(o)}
  };
 })();
 </script>
+
+<script>
+// Small requested additions only: preserve the existing app and its workflows.
+(function(){
+  const themes={
+    emerald:{primary:'#153d35',secondary:'#d6a84f',bg:'#101a18',surface:'#1a2925',surface2:'#22352f',ink:'#f6f3e9',line:'#344b43'},
+    royal:{primary:'#253b70',secondary:'#e7bd65',bg:'#10172a',surface:'#1a2742',surface2:'#26385b',ink:'#f4f6ff',line:'#3b5077'},
+    burgundy:{primary:'#702d3c',secondary:'#e9bd75',bg:'#211318',surface:'#321d25',surface2:'#492733',ink:'#fff4f0',line:'#63404a'},
+    charcoal:{primary:'#30343b',secondary:'#70c7b0',bg:'#111418',surface:'#20262c',surface2:'#2c343c',ink:'#f2f5f7',line:'#414c55'}
+  };
+  function applyTheme(key){
+    const t=themes[key]||themes.emerald,root=document.documentElement.style;
+    root.setProperty('--site-primary',t.primary);root.setProperty('--site-secondary',t.secondary);
+    root.setProperty('--site-background',t.bg);root.setProperty('--surface',t.surface);
+    root.setProperty('--surface2',t.surface2);root.setProperty('--ink',t.ink);
+    root.setProperty('--line',t.line);db.theme=key;save();
+  }
+  applyTheme(db.theme||'emerald');
+  const style=document.createElement('style');
+  style.textContent=`
+    .top{position:sticky;overflow:hidden;background-image:linear-gradient(90deg,rgba(9,35,29,.96),rgba(9,35,29,.78)),url('https://images.unsplash.com/photo-1563379091339-03246963d96a?auto=format&fit=crop&w=1200&q=85');background-size:cover;background-position:center 48%}
+    .brand{min-width:0;flex:1}.brand h1{font-size:clamp(23px,3.4vw,34px)!important;letter-spacing:.5px;text-shadow:0 2px 14px #0009}
+    .logo{animation:aghaiLogoPulse 3s ease-in-out infinite}
+    @keyframes aghaiLogoPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px #e4bd69)}50%{transform:scale(1.07);filter:drop-shadow(0 0 10px #e4bd69)}}
+    .app:before,.app:after{content:"";position:fixed;top:0;bottom:0;width:4px;z-index:8;pointer-events:none;background:linear-gradient(180deg,transparent,var(--site-secondary),#54c49a,var(--site-secondary),transparent);background-size:100% 220%;animation:aghaiSideGlow 5s linear infinite}
+    .app:before{left:0}.app:after{right:0}
+    @keyframes aghaiSideGlow{to{background-position:0 220%}}
+    .dish-photo{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:11px;border:1px solid var(--line);display:block;background:var(--surface2)}
+    .dish{overflow:hidden}
+    @media(prefers-reduced-motion:reduce){.logo,.app:before,.app:after{animation:none}}
+  `;
+  document.head.appendChild(style);
+
+  const oldMenuPage=menuPage;
+  window.menuPage=function(m){
+    oldMenuPage(m);
+    const cards=m.querySelectorAll('.menu-grid .dish');
+    cards.forEach(card=>{
+      const name=(card.querySelector('.dishname')?.textContent||'').toLowerCase();
+      const sub=(card.querySelector('.sub')?.textContent||'').toLowerCase();
+      let photo='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80';
+      if(/biryani/.test(name))photo='https://images.unsplash.com/photo-1563379091339-03246963d96a?auto=format&fit=crop&w=700&q=80';
+      else if(/pulao|rice|chawal|zarda/.test(name))photo='https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=700&q=80';
+      else if(/karahi|handi|qorma|nihari|salan|curry/.test(name))photo='https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=700&q=80';
+      else if(/kebab|tikka|bbq/.test(name))photo='https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=700&q=80';
+      else if(/kheer|gulab|sweet|dessert/.test(name))photo='https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=700&q=80';
+      else if(/drink|cola|juice|lassi/.test(name))photo='https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=700&q=80';
+      else if(/roti|naan|paratha/.test(name))photo='https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=700&q=80';
+      const img=document.createElement('img');img.className='dish-photo';img.alt=name||'Food';img.loading='lazy';img.src=photo;
+      card.insertBefore(img,card.firstChild);
+    });
+  };
+  const oldSettingsPage=settingsPage;
+  window.settingsPage=function(m){
+    oldSettingsPage(m);
+    const panel=m.querySelector('.panel');
+    if(!panel||panel.querySelector('#aghaiTheme'))return;
+    const theme=document.createElement('div');theme.className='field';
+    theme.innerHTML='<label>Color Theme</label><select id="aghaiTheme"><option value="emerald">Emerald & Gold</option><option value="royal">Royal Blue</option><option value="burgundy">Burgundy Gold</option><option value="charcoal">Charcoal Mint</option></select>';
+    panel.querySelector('.quick')?.before(theme);
+    theme.querySelector('select').value=db.theme||'emerald';
+    const pin=panel.querySelector('#ownerPin');
+    if(pin){const toggle=document.createElement('button');toggle.type='button';toggle.className='soft';toggle.textContent='Show / Hide PIN';toggle.style.marginBottom='10px';toggle.onclick=()=>pin.type=pin.type==='password'?'text':'password';pin.parentElement.appendChild(toggle);}
+  };
+  window.saveSettings=function(){
+    const pin=document.getElementById('ownerPin')?.value.trim()||'';
+    if(!/^\d{4,12}$/.test(pin)){alert('PIN 4 se 12 digits ka hona chahiye');return;}
+    db.name=document.getElementById('businessName').value.trim()||'AGHAI PAKWAN CENTER';
+    db.ownerPin=pin;db.currency=document.getElementById('currency').value;
+    db.theme=document.getElementById('aghaiTheme')?.value||db.theme||'emerald';
+    save();applyTheme(db.theme);render();alert('Password aur theme save ho gaye');
+  };
+  render();
+})();
+</script>
+
 </body></html>`);w.document.close()}
 function printMenu(){let w=window.open('','_blank','width=800,height=700');if(!w){alert('Popup allow karein');return}w.document.write(`<html><head><title>Menu</title><style>body{font:14px Arial;padding:25px;color:#111}.logo{text-align:center;font:bold 42px Georgia;color:#17483d}h1{text-align:center}h2{border-bottom:1px solid #777;padding-bottom:5px} .item{display:flex;justify-content:space-between;border-bottom:1px dotted #aaa;padding:7px}.muted{font-size:11px;color:#555}</style></head><body><div class="logo">S</div><h1>${db.name} · MENU</h1>${cats.slice(1).map(c=>{let a=db.items.filter(x=>x.cat===c);return a.length?`<h2>${c}</h2>${a.map(x=>`<div class="item"><span>${x.en}<br><span class="muted">${x.ur} · ${x.ro}</span></span><b>${money(x.price)} / ${x.unit}</b></div>`).join('')}`:''}).join('')}<p style="text-align:center">Powered by S</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
 function exportCSV(){let rows=[['Bill','Date','Customer','Type','Items','Subtotal','Discount','GST','Total'],...db.orders.map(o=>[o.id,fmtDate(o.time),o.customer,o.type,o.items.map(x=>x.name+' x'+x.qty).join('; '),o.subtotal,o.discount,o.gst,o.total])];let csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='AGHAI-Pakwan-Sales.csv';a.click();URL.revokeObjectURL(a.href)}function backupData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='AGHAI-Pakwan-Backup.json';a.click();URL.revokeObjectURL(a.href)}function resetData(){if(confirm('Reset all demo data? This cannot be undone.')){localStorage.removeItem('aghaiPakwanDB');location.reload()}}
