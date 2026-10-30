@@ -67,11 +67,13 @@ function applyPakwanTheme(name){
  db.theme=name;save();
 }
 function foodImage(x){
- const c=(x.cat||'').toLowerCase();
- if(c==='rice')return 'https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=700&q=85';
- if(c==='karahi'||c==='handi'||c==='salan')return 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=700&q=85';
- if(c==='bbq')return 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=700&q=85';
- if(c==='sweets')return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=700&q=85';
+ const c=(x.cat||'').toLowerCase(), n=(x.en||'').toLowerCase()+' '+(x.ur||'').toLowerCase();
+ if(c.includes('sweet')||c.includes('mithai')||/gulab|jalebi|kheer|halwa|dessert/.test(n))return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=700&q=85';
+ if(c.includes('naan')||c.includes('bread')||/naan|roti|paratha|chapati/.test(n))return 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=700&q=85';
+ if(c.includes('kebab')||c.includes('kabob')||/kebab|kab[a]?b|seekh|boti|tikka|malai/.test(n))return 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=700&q=85';
+ if(c.includes('curry')||c.includes('salan')||c.includes('karahi')||c.includes('handi')||/curry|qorma|korma|nihari|paya|dahl|daal/.test(n))return 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=700&q=85';
+ if(c==='rice'||c.includes('biryani')||/biryani|pulao|rice/.test(n))return 'https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=700&q=85';
+ if(c==='bbq'||/bbq|grill/.test(n))return 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=700&q=85';
  if(c==='drinks')return 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=700&q=85';
  return 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=85';
 }
@@ -97,7 +99,7 @@ document.head.appendChild(pakwanStyle);
 const brand=document.querySelector('.brand');
 if(brand&&!document.querySelector('.brand-food-strip')){
  const strip=document.createElement('div');strip.className='brand-food-strip';
- ['https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=180&q=80','https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=180&q=80','https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=180&q=80'].forEach((src)=>{const im=document.createElement('img');im.src=src;im.alt='Pakwan food';strip.appendChild(im)});
+ ['https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=180&q=80','https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=180&q=80','https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=180&q=80','https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=180&q=80','https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=180&q=80'].forEach((src)=>{const im=document.createElement('img');im.src=src;im.alt='Pakwan food';strip.appendChild(im)});
  brand.appendChild(strip);
 }
 const themePicker=document.createElement('select');themePicker.className='theme-select no-print';themePicker.id='pakwanTheme';
