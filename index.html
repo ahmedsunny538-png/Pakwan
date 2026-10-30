@@ -58,7 +58,13 @@ const pakwanThemes={
  emerald:{primary:'#17483d',secondary:'#e5b95c',background:'#101a17',surface:'#1b2b25',surface2:'#294238',ink:'#f8f4e8',muted:'#c0c9bf',line:'#3b594b',green:'#72c69a',gold:'#edc66d'},
  royal:{primary:'#182d52',secondary:'#e6bd70',background:'#101827',surface:'#1b2940',surface2:'#293b59',ink:'#f4f3ee',muted:'#b9c5d6',line:'#3a4c69',green:'#77c8a4',gold:'#f0ca79'},
  maroon:{primary:'#652b2b',secondary:'#edbd70',background:'#1b1112',surface:'#2b1c1d',surface2:'#472829',ink:'#fff4e9',muted:'#d3bdbc',line:'#654142',green:'#9bd1a2',gold:'#f2c978'},
- cream:{primary:'#6b4227',secondary:'#b47a32',background:'#f5eee2',surface:'#fffaf1',surface2:'#efe1cc',ink:'#33251a',muted:'#806e5d',line:'#ddc9ae',green:'#397d56',gold:'#9c6424'}
+ cream:{primary:'#6b4227',secondary:'#b47a32',background:'#f5eee2',surface:'#fffaf1',surface2:'#efe1cc',ink:'#33251a',muted:'#806e5d',line:'#ddc9ae',green:'#397d56',gold:'#9c6424'},
+ midnight:{primary:'#241b46',secondary:'#c6a7ff',background:'#100d20',surface:'#211a38',surface2:'#332653',ink:'#f8f4ff',muted:'#c6bddb',line:'#51436e',green:'#8be0c1',gold:'#d6b8ff'},
+ ocean:{primary:'#07566b',secondary:'#67e8f9',background:'#071b26',surface:'#102c3a',surface2:'#164456',ink:'#effcff',muted:'#a9cbd3',line:'#286174',green:'#72e0b0',gold:'#8be9f7'},
+ ruby:{primary:'#8d1744',secondary:'#ffb4c8',background:'#210d19',surface:'#351527',surface2:'#55203b',ink:'#fff1f5',muted:'#e0b7c7',line:'#74334f',green:'#a7e2b1',gold:'#ffc2d2'},
+ sunset:{primary:'#9a451f',secondary:'#ffd08a',background:'#24140e',surface:'#3b2118',surface2:'#60351f',ink:'#fff6e9',muted:'#dfc1a4',line:'#805033',green:'#a6d69a',gold:'#ffd08a'},
+ graphite:{primary:'#30343b',secondary:'#f5c96a',background:'#111318',surface:'#20242b',surface2:'#303640',ink:'#f4f5f7',muted:'#b8bec8',line:'#454c57',green:'#91d6b1',gold:'#f5c96a'},
+ rose:{primary:'#8a4961',secondary:'#f5c1d2',background:'#21151c',surface:'#382430',surface2:'#563548',ink:'#fff4f8',muted:'#d9bac8',line:'#70495d',green:'#a7d7b0',gold:'#f5c1d2'}
 };
 function applyPakwanTheme(name){
  const t=pakwanThemes[name]||pakwanThemes.emerald;
@@ -80,20 +86,20 @@ function foodImage(x){
 const pakwanStyle=document.createElement('style');
 pakwanStyle.textContent=`
 .brand{min-width:0}.brand-food-strip{display:flex;gap:5px;margin-left:5px}
-.brand-food-strip img{width:48px;height:42px;object-fit:cover;border-radius:9px;border:2px solid var(--site-secondary);box-shadow:0 3px 12px #0005}
+.brand-food-strip img{width:66px;height:58px;object-fit:cover;border-radius:9px;border:2px solid var(--site-secondary);box-shadow:0 3px 12px #0005}
 .theme-select{background:#ffffff18;color:white;border:1px solid #ffffff55;border-radius:9px;padding:8px 9px;font-weight:700;max-width:130px}
 .theme-select option{color:#222;background:white}
 .menu-hero{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:center;padding:14px;margin-bottom:14px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(120deg,var(--surface2),var(--surface))}
 .menu-hero h3{font:700 22px Georgia,serif;margin:0 0 5px;color:var(--gold)}
 .menu-hero p{margin:0;color:var(--muted);font-size:12px}
-.menu-hero img{width:100%;height:112px;object-fit:cover;border-radius:13px}
+.menu-hero img{width:100%;height:190px;object-fit:cover;border-radius:13px}
 .dish{overflow:hidden;padding:0 0 12px!important}
-.dish-photo{width:100%;height:118px;object-fit:cover;display:block}
+.dish-photo{width:100%;height:210px;object-fit:cover;display:block}
 .dish .dishname,.dish .sub,.dish .price,.dish .quick{margin-left:12px;margin-right:12px}
 .dish .dishname{margin-top:4px}
 .dish .quick{display:flex;gap:6px}
 .dish .quick button{flex:1}
-@media(max-width:560px){.brand-food-strip img{width:31px;height:32px}.brand-food-strip{gap:3px;margin-left:0}.menu-hero{grid-template-columns:1fr 105px;padding:10px;gap:8px}.menu-hero img{height:86px}.menu-hero h3{font-size:17px}.dish-photo{height:88px}.theme-select{max-width:96px;padding:7px 5px;font-size:10px}}
+@media(max-width:560px){.brand-food-strip img{width:48px;height:46px}.brand-food-strip{gap:3px;margin-left:0}.menu-hero{grid-template-columns:1fr 105px;padding:10px;gap:8px}.menu-hero img{height:145px}.menu-hero h3{font-size:17px}.dish-photo{height:145px}.theme-select{max-width:96px;padding:7px 5px;font-size:10px}}
 `;
 document.head.appendChild(pakwanStyle);
 const brand=document.querySelector('.brand');
@@ -103,7 +109,7 @@ if(brand&&!document.querySelector('.brand-food-strip')){
  brand.appendChild(strip);
 }
 const themePicker=document.createElement('select');themePicker.className='theme-select no-print';themePicker.id='pakwanTheme';
-themePicker.innerHTML='<option value="emerald">Emerald Gold</option><option value="royal">Royal Blue</option><option value="maroon">Pakwan Maroon</option><option value="cream">Classic Cream</option>';
+themePicker.innerHTML='<option value="emerald">Emerald Gold</option><option value="royal">Royal Blue</option><option value="maroon">Pakwan Maroon</option><option value="cream">Classic Cream</option><option value="midnight">Midnight Purple</option><option value="ocean">Ocean Blue</option><option value="ruby">Ruby Pink</option><option value="sunset">Sunset Spice</option><option value="graphite">Graphite Gold</option><option value="rose">Rose Velvet</option>';
 themePicker.value=db.theme||'emerald';themePicker.onchange=()=>applyPakwanTheme(themePicker.value);
 const langbar=document.querySelector('.langbar');
 if(langbar&&!document.getElementById('pakwanTheme'))langbar.insertAdjacentElement('afterend',themePicker);
@@ -180,5 +186,32 @@ function printSales(){let html=`<h1>${db.name}</h1><div class="meta">SALES REPOR
 function printBill(o){let rows=o.items.map(x=>`<tr><td>${x.name}<div style="font-size:9px;color:#555">${x.unit||''}</div></td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('');let html=`<h1>${db.name}</h1><div class="meta">${o.type} · ${o.id}<br>${fmtDate(o.time)}<br>${o.customer}</div><table><thead><tr><th>Item</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table><div class="summary"><div><span>Subtotal</span><b>${money(o.subtotal)}</b></div><div><span>Discount</span><b>${money(o.discount)}</b></div><div><span>GST</span><b>${money(o.gst)}</b></div><div class="net"><span>NET TOTAL</span><b>${money(o.total)}</b></div></div><div class="billfoot">Thank you · Shukriya<br>Please visit again</div>`;printPreview('Bill '+o.id,db.counterSettings?.receiptWidth||'80',html)}
 function printMenu(){let html=`<h1>${db.name}</h1><div class="meta">MENU CARD · Rates in PKR</div>${cats.filter(c=>c!=='All').map(c=>{let a=db.items.filter(x=>x.cat===c);return a.length?`<h2>${c}</h2>${a.map(x=>`<div class="dishrow"><span>${x.en} <small>${x.ur||''}</small></span><b>${money(x.price)} / ${x.unit}</b></div>`).join('')}`:''}).join('')}`;printPreview('Menu Card','A4',html)}
 render();
+
+// AGHAI visual upgrade: larger food photography and expanded theme palette.
+const visualUpgrade=document.createElement('style');
+visualUpgrade.textContent=`
+.brand-food-strip{gap:7px!important}
+.brand-food-strip img{width:70px!important;height:62px!important;border-radius:12px!important}
+.menu-hero img{height:220px!important}
+.dish-photo{height:220px!important;object-fit:cover!important}
+.dish{border-radius:17px!important;box-shadow:0 8px 22px #0003}
+.theme-select{min-width:145px;max-width:180px!important;border:1px solid var(--site-secondary)!important;box-shadow:0 0 12px color-mix(in srgb,var(--site-secondary) 25%,transparent)}
+button.gold{box-shadow:0 3px 12px color-mix(in srgb,var(--site-secondary) 25%,transparent)}
+@media(max-width:950px){.brand-food-strip img{width:54px!important;height:50px!important}.menu-hero img{height:175px!important}.dish-photo{height:175px!important}}
+@media(max-width:560px){
+ .top{align-items:flex-start;flex-wrap:wrap}
+ .brand{flex-wrap:wrap;gap:7px}
+ .brand-food-strip{width:100%;margin-left:0!important;gap:5px!important}
+ .brand-food-strip img{width:calc((100vw - 54px)/5)!important;height:64px!important;max-width:75px}
+ .topright{width:100%;justify-content:flex-end}
+ .theme-select{max-width:170px!important;min-width:145px}
+ .menu-hero{grid-template-columns:1fr!important}
+ .menu-hero img{height:190px!important}
+ .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .dish-photo{height:150px!important}
+}
+`;
+document.head.appendChild(visualUpgrade);
+
 </script>
 </body></html>
